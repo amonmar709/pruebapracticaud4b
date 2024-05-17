@@ -1,12 +1,17 @@
 package org.iesvdm.appointment.repository;
 
-import org.iesvdm.appointment.entity.Appointment;
+import org.iesvdm.appointment.entity.*;
 import org.iesvdm.appointment.repository.impl.AppointmentRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AppointmentRepositoryImplTest {
 
@@ -31,7 +36,20 @@ public class AppointmentRepositoryImplTest {
      */
     @Test
     void getOneTest() {
+        //When
+        Appointment appointment1 = new Appointment();
+        appointment1.setId(1);
+        Appointment appointment2 = new Appointment();
+        appointment2.setId(2);
 
+        //do
+        appointments.add(appointment1);
+        appointments.add(appointment2);
+
+        //Then
+        assertThat(appointmentRepository.getOne(1)).isEqualTo(appointment1);
+        assertThat(appointmentRepository.getOne(2)).isEqualTo(appointment2);
+        assertThat(appointmentRepository.getOne(3)).isNull();
     }
 
     /**
@@ -42,7 +60,18 @@ public class AppointmentRepositoryImplTest {
      */
     @Test
     void saveTest() {
+        //When
+        Appointment appointment1 = new Appointment();
+        appointment1.setId(1);
+        Appointment appointment2 = new Appointment();
+        appointment2.setId(2);
 
+        //do
+        appointments.add(appointment1);
+        appointments.add(appointment2);
+
+        //Then
+        assertThat(appointments.size()).isEqualTo(2);
     }
 
     /**
@@ -54,6 +83,18 @@ public class AppointmentRepositoryImplTest {
      */
     @Test
     void findCanceledByUserTest() {
+        //When
+        Appointment appointment1 = new Appointment();
+        appointment1.setStatus(AppointmentStatus.CANCELED);
+        Appointment appointment2 = new Appointment();
+        appointment2.setStatus(AppointmentStatus.CONFIRMED);
+
+        //do
+        appointments.add(appointment1);
+        appointments.add(appointment2);
+
+        //Then
+        assertThat(appointmentRepository.findCanceledByUser(1)).isEqualTo(appointment1);
 
     }
 
@@ -69,6 +110,28 @@ public class AppointmentRepositoryImplTest {
     @Test
     void findByCustomerIdWithStartInPeroidTest() {
 
+        //When
+        Appointment appointment1 = new Appointment();
+        appointment1.setId(1);
+        Appointment appointment2 = new Appointment();
+        appointment2.setId(1);
+        Appointment appointment3 = new Appointment();
+        appointment3.setId(1);
+        appointment3.setStart(LocalDateTime.of(2020, 1, 1, 0, 0));
+        appointment3.setEnd(LocalDateTime.of(2020, 1, 2, 0, 0));
+
+        //do
+        appointments.add(appointment1);
+        appointments.add(appointment2);
+        appointments.add(appointment3);
+
+        //Then
+        appointmentRepository.save(appointment1);
+        appointmentRepository.save(appointment2);
+        appointmentRepository.save(appointment3);
+
+        /** Devuelve false porque no encuentra la cita, cuando yo espero que devuelva true porque esta ya en la colección */
+        assertThat(appointmentRepository.findByCustomerIdWithStartInPeroid(1, LocalDateTime.of(2020, 1, 1, 0, 0), LocalDateTime.of(2020, 1, 2, 0, 0)).contains(appointment3)).isTrue();
     }
 
 
